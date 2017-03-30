@@ -67,7 +67,7 @@ function makeCron(borrowExpirationDate, userId, bookId){
 
 function sendNotificationToUser(userId, bookId, scheduleDate) {
     borrowController.borrow(userId, bookId, function(resp) {
-        if(resp.error || resp == null){
+        if(resp == null || resp.error){
             console.log(resp);
         }else{
             if(resp.borrowExpirationDate.getDate() == scheduleDate.getDate()
@@ -109,7 +109,7 @@ function repeatCron(scheduleDate, userId, bookId){
 
 function repeatNotification(userId, bookId, scheduleDate){
     borrowController.borrow(userId, bookId, function(resp) {
-        if(resp.error || resp == null){
+        if(resp == null || resp.error){
             console.log(resp);
         }else{
             if(resp.borrowFinishDate < scheduleDate){
@@ -847,4 +847,3 @@ app.delete('/courses/:courseName', function(req, res) {
 });
 
 ////////////////////////////////////////////////////////////////////////////////
-
