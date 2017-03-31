@@ -60,7 +60,7 @@ exports.save = function(name, period, credits, course, callback) {
     }).save(function(error, subject) {
 
         if(error) {
-            callback({error: 'Não foi possível salvar a disciplina'})
+            callback({error: 'Não foi possível salvar a disciplina'});
         } else {
             callback(subject);
         }
@@ -71,26 +71,30 @@ exports.update = function(name, newName, period, course, factor, callback) {
 
     db.Subject.findOne({name : name, course: course}, function(error, subject) {
 
-        if(newName) {
-            subject.name = newName;
-        }
-
-        if(period > 0 && period <= 8) {
-            subject.period = period;
-        }
-
-        if(factor) {
-            subject.numBibliographies += factor;
-        }
-
-        subject.save(function(error, subject) {
-
-            if(error) {
-                callback({error: 'Não foi possível editar a disciplina'})
-            } else {
-                callback(subject);
+        if(error || subject == null) {
+            callback({error: 'Não foi possível editar a disciplina'});
+        } else {
+            if(newName) {
+                subject.name = newName;
             }
-        });
+
+            if(period > 0 && period <= 8) {
+                subject.period = period;
+            }
+
+            if(factor) {
+                subject.numBibliographies += factor;
+            }
+
+            subject.save(function(error, subject) {
+
+                if(error) {
+                    callback({error: 'Não foi possível editar a disciplina'});
+                } else {
+                    callback(subject);
+                }
+            });
+        }
     });
 };
 
@@ -98,7 +102,7 @@ exports.delete = function(name, course, callback) {
 
     db.Subject.findOne({name : name, course: course}, function(error, subject) {
 
-        if(error) {
+        if(error || subject == null) {
             callback({error: 'Não foi possível excluir a disciplina'});
         } else {
 

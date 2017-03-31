@@ -56,7 +56,7 @@ exports.delete = function(userId, bookId, callback) {
 
     db.Desired.findOne({userId: userId, bookId: bookId}, function(error, desired) {
 
-        if(error) {
+        if(error || desired == null) {
             callback({error: 'Não foi possível excluir o desejado'});
         } else {
 

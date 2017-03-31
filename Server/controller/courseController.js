@@ -19,7 +19,7 @@ exports.course = function(courseName, callback) {
     db.Course.findOne({courseName : courseName}, function(error, course) {
 
         if(error) {
-            callback({error: 'Não foi possível retornar os cursos'});
+            callback({error: 'Não foi possível retornar o curso'});
         } else {
             callback(course);
         }
@@ -34,7 +34,6 @@ exports.save = function(courseName, periods, callback) {
     }).save(function(error, course) {
 
         if(error) {
-            console.log(error)
             callback({error: 'Não foi possível salvar o curso.'})
         } else {
             callback(course);
@@ -47,7 +46,7 @@ exports.delete = function(courseName, callback) {
 
     db.Course.findOne({courseName : courseName}, function(error, course) {
 
-        if(error) {
+        if(error || course == null) {
             callback({error: 'Não foi possível excluir o curso'});
         } else {
 

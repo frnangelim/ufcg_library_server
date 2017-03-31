@@ -55,43 +55,47 @@ exports.update = function(id, fullName, firstName, course, notifications, pictur
 
     db.User.findById(id, function(error, user) {
 
-        if(fullName) {
+        if(error || user == null) {
+            callback({error: 'Não foi possível editar o usuário.'});
+        } else {
+            if(fullName) {
 
-            user.fullName = fullName;
-        }
-
-        if(firstName) {
-
-            user.firstName = firstName;
-        }
-
-        if(course) {
-
-            user.course = course;
-        }
-
-        if(notifications) {
-
-            user.notifications = notifications;
-        }
-
-        if(picture) {
-
-            user.picture = picture;
-        }
-
-        if(firebaseToken) {
-            user.firebaseToken = firebaseToken;
-        }
-
-        user.save(function(error, user) {
-
-            if(error) {
-                callback({error: 'Não foi possível editar o usuário.'})
-            } else {
-                callback(user);
+                user.fullName = fullName;
             }
-        });
+
+            if(firstName) {
+
+                user.firstName = firstName;
+            }
+
+            if(course) {
+
+                user.course = course;
+            }
+
+            if(notifications) {
+
+                user.notifications = notifications;
+            }
+
+            if(picture) {
+
+                user.picture = picture;
+            }
+
+            if(firebaseToken) {
+                user.firebaseToken = firebaseToken;
+            }
+
+            user.save(function(error, user) {
+
+                if(error) {
+                    callback({error: 'Não foi possível editar o usuário.'});
+                } else {
+                    callback(user);
+                }
+            });
+        }
     });
 };
 
@@ -99,7 +103,7 @@ exports.delete = function(id, callback) {
 
     db.User.findById(id, function(error,user) {
 
-        if(error) {
+        if(error || user == null) {
             callback({error: 'Não foi possível excluir o usuário'});
         } else {
 
@@ -117,7 +121,7 @@ exports.notificationUser = function(userId, callback){
 
     db.User.findById(userId, function(error,user) {
 
-        if(error) {
+        if(error || user == null) {
             callback({error: 'Não foi possível retornar o usuário'});
         } else {
             token = user.firebaseToken
@@ -136,19 +140,17 @@ exports.notificationUser = function(userId, callback){
                     body: JSON.stringify({
                         notification: {
                             title: 'Biblioteca UFCG',
-                            body: "Você tem um livro para devolver hoje"
+                            body: "Você tem um livro para devolver hoje."
                         },
                         to: token
                     })
                 }, function (error, response, body) {
                     if (error) {
-                        callback(error);      
+                        callback(error);
                     }else if (response.statusCode >= 400) {
-                        // console.error('HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage);
                          callback({response: 'HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage});
                     }
                     else {
-                        // console.log('Notificação enviada')
                          callback({response: 'Notificação enviada.'});
                     }
                 });
@@ -156,14 +158,13 @@ exports.notificationUser = function(userId, callback){
 
         }
     });
-
 }
 
 exports.notificationUserFinish = function(userId, callback){
 
     db.User.findById(userId, function(error,user) {
 
-        if(error) {
+        if(error || user == null) {
             callback({error: 'Não foi possível retornar o usuário'});
         } else {
             token = user.firebaseToken
@@ -182,19 +183,17 @@ exports.notificationUserFinish = function(userId, callback){
                     body: JSON.stringify({
                         notification: {
                             title: 'Biblioteca UFCG',
-                            body: "Hoje é o último dia para devolver seu livro"
+                            body: "Hoje é o último dia para devolver seu livro!"
                         },
                         to: token
                     })
                 }, function (error, response, body) {
                     if (error) {
-                        callback(error);      
+                        callback(error);
                     }else if (response.statusCode >= 400) {
-                        // console.error('HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage);
                          callback({response: 'HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage});
                     }
                     else {
-                        // console.log('Notificação enviada')
                          callback({response: 'Notificação enviada.'});
                     }
                 });
@@ -202,16 +201,13 @@ exports.notificationUserFinish = function(userId, callback){
 
         }
     });
-
-
-
 }
 
 exports.notificationUserLate = function(userId, callback){
 
     db.User.findById(userId, function(error,user) {
 
-        if(error) {
+        if(error || user == null) {
             callback({error: 'Não foi possível retornar o usuário'});
         } else {
             token = user.firebaseToken
@@ -236,20 +232,15 @@ exports.notificationUserLate = function(userId, callback){
                     })
                 }, function (error, response, body) {
                     if (error) {
-                        callback(error);      
+                        callback(error);
                     }else if (response.statusCode >= 400) {
-                        // console.error('HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage);
                          callback({response: 'HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage});
                     }
                     else {
-                        // console.log('Notificação enviada')
                          callback({response: 'Notificação enviada.'});
                     }
                 });
             }
-
         }
     });
-
 }
-

@@ -66,7 +66,7 @@ exports.delete = function(userId, subjectName, bookId, callback) {
     db.Bibliography.findOne({userId: userId, subjectName : subjectName, bookId : bookId},
                                             function(error, bibliography) {
 
-        if(error) {
+        if(error || bibliography == null) {
             callback({error: 'Não foi possível excluir a bibliografia'});
         } else {
 

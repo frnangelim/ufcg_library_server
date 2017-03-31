@@ -132,7 +132,7 @@ exports.update = function(id, callNumber, title, author, edition,
 
     db.Book.findById(id, function(error, book) {
 
-        if(error) {
+        if(error || book == null) {
             callback({error: 'Não foi possível editar o livro.'});
         } else {
             if(callNumber) {
@@ -179,7 +179,7 @@ exports.delete = function(id, callback) {
 
     db.Book.findById(id, function(error, book) {
 
-        if(error) {
+        if(error || book == null) {
             callback({error: 'Não foi possível excluir o livro'});
         } else {
 
@@ -197,7 +197,7 @@ exports.saveRating = function(id, rating, callback) {
 
     db.Book.findById(id, function(error, book) {
 
-        if(error) {
+        if(error || book == null) {
             callback({error: 'Não possível adicionar uma avaliação ao livro'});
         } else {
 
@@ -224,7 +224,7 @@ exports.updateRating = function(id, newRating, oldRating, callback) {
 
     db.Book.findById(id, function(error, book) {
 
-        if(error) {
+        if(error || book == null) {
             callback({error: 'Não foi possível alterar a avaliação do livro'});
         } else {
 
@@ -251,8 +251,8 @@ exports.deleteRating = function(id, oldRating, callback) {
 
     db.Book.findById(id, function(error, book) {
 
-        if(error) {
-            callback({error: error});
+        if(error || book == null) {
+            callback({error: 'Não foi possível deletar a avaliação do livro'});
         } else {
             if(book.numRating) {
                 book.ratingSum -= oldRating;

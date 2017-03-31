@@ -69,19 +69,22 @@ exports.update = function(userId, subjectName, course, isFinished, callback) {
 
     db.Enrollment.findOne({userId : userId, subjectName : subjectName, course: course}, function(error, enrollment) {
 
-        if(isFinished) {
-            enrollment.isFinished = isFinished;
-        }
-
-        enrollment.save(function(error, enrollment) {
-
-            if(error) {
-                console.log(error)
-                callback({error: 'Não foi possível editar o enrollment'})
-            } else {
-                callback(enrollment);
+        if(error || enrollment == null) {
+            callback({error: 'Não foi possível editar o enrollment'});
+        } else {
+            if(isFinished) {
+                enrollment.isFinished = isFinished;
             }
-        });
+
+            enrollment.save(function(error, enrollment) {
+
+                if(error) {
+                    callback({error: 'Não foi possível editar o enrollment'});
+                } else {
+                    callback(enrollment);
+                }
+            });
+        }
     });
 };
 
@@ -89,7 +92,7 @@ exports.delete = function(userId, subjectName, course, callback) {
 
     db.Enrollment.findOne({userId : userId, subjectName : subjectName, course : course}, function(error, enrollment) {
 
-        if(error) {
+        if(error || enrollment == null) {
             callback({error: 'Não foi possível excluir a matrícula'});
         } else {
 

@@ -70,7 +70,7 @@ exports.update = function(userId, bookId, rating, commentary, callback) {
 
     db.Rated.findOne({userId: userId, bookId: bookId}, function(error, rated) {
 
-        if(error || isNaN(rating)) {
+        if(error || rated == null || isNaN(rating)) {
             callback({error: 'Não foi possível editar a avaliação'});
         } else {
 
@@ -93,7 +93,7 @@ exports.delete = function(userId, bookId, callback) {
 
     db.Rated.findOne({userId: userId, bookId: bookId}, function(error, rated) {
 
-        if(error) {
+        if(error || rated == null) {
             callback({error: error});
         } else {
 

@@ -19,13 +19,12 @@ exports.save = function(userId, message, subject, signature, callback) {
         'message': message,
         'subject': subject,
         'signature': signature
-    }).save(function(error, user) {
+    }).save(function(error, complaint) {
 
         if(error) {
-            console.log(error)
             callback({error: 'Não foi possível salvar a reclamação.'})
         } else {
-            callback(user);
+            callback(complaint);
         }
     });
 };

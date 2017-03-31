@@ -27,7 +27,7 @@ var nodemailer = require('nodemailer');
 var mailler = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'ufcg.biblioteca@gmail.com',
+        user: 'library.app.ufcg@gmail.com',
         pass: 'libraryufcg'
     }
 });
@@ -792,8 +792,8 @@ app.post('/users/:userId/complaint', function(req, res) {
 function sendEmail(message, subject, signature) {
 
     var email = {
-        from: 'ufcg.biblioteca@gmail.com',
-        to: 'ufcg.biblioteca@gmail.com',
+        from: 'library.app.ufcg@gmail.com',
+        to: 'library.app.ufcg@gmail.com',
         subject: 'Library App - ' + subject,
         html: message + '<br />' + '<br />' + 'De: ' + signature
     };
@@ -847,3 +847,4 @@ app.delete('/courses/:courseName', function(req, res) {
 });
 
 ////////////////////////////////////////////////////////////////////////////////
+
