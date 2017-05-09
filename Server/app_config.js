@@ -18,9 +18,7 @@ app.listen(5001);
 
 app.use(allowCors);
 
-app.use(bodyParser({limit: "50mb"}));
-
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: "50mb"}));
 
 app.use(bodyParser.urlencoded({
         extended: true

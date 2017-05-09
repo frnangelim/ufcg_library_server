@@ -32,7 +32,6 @@ var mailler = nodemailer.createTransport({
     }
 });
 
-
 ////////////////////////////////////////////////////////// Notificações
 
 var schedule = require('node-schedule');
@@ -40,8 +39,6 @@ var schedule = require('node-schedule');
 var bodyParser = require('body-parser');
 
 var firebase = require("firebase");
-
-var db = require('./db_config.js');
 
 app.use(bodyParser.json())
 
@@ -61,7 +58,6 @@ function makeCron(borrowExpirationDate, userId, bookId){
     var cron = schedule.scheduleJob('01 6 ' + dayCron + ' ' + monthCron + ' 0-7', function(){  //Notificação para as 6:00 do dia da data de entrega.(Minute, hour, day, month, day of week)
         sendNotificationToUser(userId, bookId, borrowExpirationDate);
     });
-
 
 }
 
@@ -128,8 +124,6 @@ function repeatNotification(userId, bookId, scheduleDate){
     });
 }
 
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.get('/', function(req, res) {
@@ -147,7 +141,7 @@ app.get('/users', function(req, res) {
 
 app.get('/users/:id', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('id')));
+    var id = validator.trim(validator.escape(req.params.id));
 
     userController.user(id, function(resp) {
         res.json(resp);
@@ -156,12 +150,12 @@ app.get('/users/:id', function(req, res) {
 
 app.post('/users', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('_id')));
-    var fullName = validator.trim(validator.escape(req.param('fullName')));
-    var firstName = validator.trim(validator.escape(req.param('firstName')));
-    var course = validator.trim(validator.escape(req.param('course')));
-    var picture = validator.trim(validator.escape(req.param('picture')));
-    var notifications = validator.trim(validator.escape(req.param('notifications')));
+    var id = validator.trim(validator.escape(req.body._id));
+    var fullName = validator.trim(validator.escape(req.body.fullName));
+    var firstName = validator.trim(validator.escape(req.body.firstName));
+    var course = validator.trim(validator.escape(req.body.course));
+    var picture = validator.trim(validator.escape(req.body.picture));
+    var notifications = validator.trim(validator.escape(req.body.notifications));
 
     userController.save(id, firstName, fullName, course, picture, notifications, function(resp) {
         res.json(resp);
@@ -170,14 +164,13 @@ app.post('/users', function(req, res) {
 
 app.put('/users', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('_id')));
-    var fullName = validator.trim(validator.escape(req.param('fullName')));
-    var firstName = validator.trim(validator.escape(req.param('firstName')));
-    var course = validator.trim(validator.escape(req.param('course')));
-    var notifications = validator.trim(validator.escape(req.param('notifications')));
-    var picture = validator.trim(validator.escape(req.param('picture')));
-    var firebaseToken = validator.trim(validator.escape(req.param('firebaseToken')));
-
+    var id = validator.trim(validator.escape(req.body._id));
+    var fullName = validator.trim(validator.escape(req.body.fullName));
+    var firstName = validator.trim(validator.escape(req.body.firstName));
+    var course = validator.trim(validator.escape(req.body.course));
+    var picture = validator.trim(validator.escape(req.body.picture));
+    var notifications = validator.trim(validator.escape(req.body.notifications));
+    var firebaseToken = validator.trim(validator.escape(req.body.firebaseToken));
 
     userController.update(id, fullName, firstName, course, notifications, picture, firebaseToken, function(resp) {
         res.json(resp);
@@ -186,7 +179,7 @@ app.put('/users', function(req, res) {
 
 app.delete('/users/:id', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('id')));
+    var id = validator.trim(validator.escape(req.params.id));
 
     userController.delete(id, function(resp) {
         res.json(resp);
@@ -204,13 +197,13 @@ app.get('/books/all', function(req, res) {
 
 app.get('/books', function(req, res) {
 
-    var title = validator.trim(validator.escape(req.param('titulo')));
-    var author = validator.trim(validator.escape(req.param('autor')));
-    var publishingCompany = validator.trim(validator.escape(req.param('editora')));
-    var publishingPlace = validator.trim(validator.escape(req.param('local-publicacao')));
-    var publishingInitialYear = validator.trim(validator.escape(req.param('ano-publicacao-inicial')));
-    var publishingFinalYear = validator.trim(validator.escape(req.param('ano-publicacao-final')));
-    var searchPagination = validator.trim(validator.escape(req.param('pagina')));
+    var title = validator.trim(validator.escape(req.query.titulo));
+    var author = validator.trim(validator.escape(req.query.autor));
+    var publishingCompany = validator.trim(validator.escape(req.query.editora));
+    var publishingPlace = validator.trim(validator.escape(req.query['local-publicacao']));
+    var publishingInitialYear = validator.trim(validator.escape(req.query['ano-publicacao-inicial']));
+    var publishingFinalYear = validator.trim(validator.escape(req.query['ano-publicacao-final']));
+    var searchPagination = validator.trim(validator.escape(req.query.pagina));
 
     bookController.book(title, author, publishingCompany, publishingPlace, publishingInitialYear,
                                         publishingFinalYear, searchPagination, function(resp) {
@@ -220,7 +213,7 @@ app.get('/books', function(req, res) {
 
 app.get('/books/:id', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('id')));
+    var id = validator.trim(validator.escape(req.params.id));
 
     bookController.bookId(id, function(resp) {
         res.json(resp);
@@ -229,7 +222,7 @@ app.get('/books/:id', function(req, res) {
 
 app.get('/books/:id/rating', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('id')));
+    var id = validator.trim(validator.escape(req.params.id));
 
     bookController.bookId(id, function(resp) {
         if(resp.error) {
@@ -251,14 +244,14 @@ app.get('/books/:id/rating', function(req, res) {
 
 app.post('/books', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('_id')));
-    var callNumber = validator.trim(validator.escape(req.param('callNumber')));
-    var title = validator.trim(validator.escape(req.param('title')));
-    var author = validator.trim(validator.escape(req.param('author')));
-    var edition = validator.trim(validator.escape(req.param('edition')));
-    var publishingCompany = validator.trim(validator.escape(req.param('publishingCompany')));
-    var publishingPlace = validator.trim(validator.escape(req.param('publishingPlace')));
-    var publishingYear = validator.trim(validator.escape(req.param('publishingYear')));
+    var id = validator.trim(validator.escape(req.body._id));
+    var callNumber = validator.trim(validator.escape(req.body.callNumber));
+    var title = validator.trim(validator.escape(req.body.title));
+    var author = validator.trim(validator.escape(req.body.author));
+    var edition = validator.trim(validator.escape(req.body.edition));
+    var publishingCompany = validator.trim(validator.escape(req.body.publishingCompany));
+    var publishingPlace = validator.trim(validator.escape(req.body.publishingPlace));
+    var publishingYear = validator.trim(validator.escape(req.body.publishingYear));
 
     bookController.save(id, callNumber, title, author, edition,
         publishingCompany, publishingPlace, publishingYear, function(resp) {
@@ -268,14 +261,14 @@ app.post('/books', function(req, res) {
 
 app.put('/books', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('_id')));
-    var callNumber = validator.trim(validator.escape(req.param('callNumber')));
-    var title = validator.trim(validator.escape(req.param('title')));
-    var author = validator.trim(validator.escape(req.param('author')));
-    var edition = validator.trim(validator.escape(req.param('edition')));
-    var publishingCompany = validator.trim(validator.escape(req.param('publishingCompany')));
-    var publishingPlace = validator.trim(validator.escape(req.param('publishingPlace')));
-    var publishingYear = validator.trim(validator.escape(req.param('publishingYear')));
+    var id = validator.trim(validator.escape(req.body._id));
+    var callNumber = validator.trim(validator.escape(req.body.callNumber));
+    var title = validator.trim(validator.escape(req.body.title));
+    var author = validator.trim(validator.escape(req.body.author));
+    var edition = validator.trim(validator.escape(req.body.edition));
+    var publishingCompany = validator.trim(validator.escape(req.body.publishingCompany));
+    var publishingPlace = validator.trim(validator.escape(req.body.publishingPlace));
+    var publishingYear = validator.trim(validator.escape(req.body.publishingYear));
 
     bookController.update(id, callNumber, title, author, edition,
         publishingCompany, publishingPlace, publishingYear, function(resp) {
@@ -285,7 +278,7 @@ app.put('/books', function(req, res) {
 
 app.delete('/books/:id', function(req, res) {
 
-    var id = validator.trim(validator.escape(req.param('id')));
+    var id = validator.trim(validator.escape(req.params.id));
 
     bookController.delete(id, function(resp) {
         res.json(resp);
@@ -303,7 +296,7 @@ app.get('/borrows/all', function(req,res) {
 
 app.get('/users/:userId/borrows', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
+    var userId = validator.trim(validator.escape(req.params.userId));
 
     borrowController.listByUser(userId, function(resps) {
         res.json(resps);
@@ -312,8 +305,8 @@ app.get('/users/:userId/borrows', function(req, res) {
 
 app.get('/borrows', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var bookId = validator.trim(validator.escape(req.query.bookId));
 
     borrowController.borrow(userId, bookId, function(resp) {
         res.json(resp);
@@ -322,11 +315,11 @@ app.get('/borrows', function(req, res) {
 
 app.post('/borrows', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
-    var borrowDate = new Date(validator.trim(validator.escape(req.param('borrowDate'))));
-    var borrowExpirationDate = new Date(validator.trim(validator.escape(req.param('borrowExpirationDate'))));
-    var borrowFinishDate = new Date(validator.trim(validator.escape(req.param('borrowFinishDate'))));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var bookId = validator.trim(validator.escape(req.body.bookId));
+    var borrowDate = new Date(validator.trim(validator.escape(req.body.borrowDate)));
+    var borrowExpirationDate = new Date(validator.trim(validator.escape(req.body.borrowExpirationDate)));
+    var borrowFinishDate = new Date(validator.trim(validator.escape(req.body.borrowFinishDate)));
 
     borrowController.save(userId, bookId, borrowDate,
         borrowExpirationDate, borrowFinishDate, function(resp) {
@@ -340,11 +333,11 @@ app.post('/borrows', function(req, res) {
 
 app.put('/borrows', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
-    var borrowDate = new Date(validator.trim(validator.escape(req.param('borrowDate'))));
-    var borrowExpirationDate = new Date(validator.trim(validator.escape(req.param('borrowExpirationDate'))));
-    var borrowFinishDate = new Date(validator.trim(validator.escape(req.param('borrowFinishDate'))));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var bookId = validator.trim(validator.escape(req.body.bookId));
+    var borrowDate = new Date(validator.trim(validator.escape(req.body.borrowDate)));
+    var borrowExpirationDate = new Date(validator.trim(validator.escape(req.body.borrowExpirationDate)));
+    var borrowFinishDate = new Date(validator.trim(validator.escape(req.body.borrowFinishDate)));
 
     borrowController.update( userId, bookId, borrowDate,
         borrowExpirationDate, borrowFinishDate, function(resp) {
@@ -357,20 +350,10 @@ app.put('/borrows', function(req, res) {
 
 app.delete('/borrows', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var bookId = validator.trim(validator.escape(req.query.bookId));
 
     borrowController.delete(userId, bookId, function(resp) {
-        res.json(resp);
-    });
-});
-
-app.delete('/users/:userId/borrows/delete/:bookId', function(req, res) {
-
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId= validator.trim(validator.escape(req.param('bookId')));
-
-    borrowController.deleteByBook(userId, bookId, function(resp) {
         res.json(resp);
     });
 });
@@ -386,26 +369,17 @@ app.get('/ratings/all', function(req, res) {
 
 app.get('/ratings', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var bookId = validator.trim(validator.escape(req.query.bookId));
 
     ratedController.rating(userId, bookId, function(resp) {
         res.json(resp);
     });
 });
 
-app.get('/users/:userId/ratings', function(req, res) {
-
-    var userId = validator.trim(validator.escape(req.param('userId')));
-
-    ratedController.listByUserId(userId, function(resp) {
-        res.json(resp);
-    });
-});
-
 app.get('/books/:bookId/ratings', function(req, res) {
 
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
+    var bookId = validator.trim(validator.escape(req.params.bookId));
 
     ratedController.listByBookId(bookId, function(resp) {
         res.json(resp);
@@ -414,11 +388,11 @@ app.get('/books/:bookId/ratings', function(req, res) {
 
 app.post('/ratings', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var userName = validator.trim(validator.escape(req.param('userName')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
-    var rating = new Number(validator.trim(validator.escape(req.param('rating'))));
-    var commentary = validator.trim(validator.escape(req.param('commentary')));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var userName = validator.trim(validator.escape(req.body.userName));
+    var bookId = validator.trim(validator.escape(req.body.bookId));
+    var rating = parseInt(validator.trim(validator.escape(req.body.rating)));
+    var commentary = validator.trim(validator.escape(req.body.commentary));
 
     bookController.saveRating(bookId, rating, function(respBook) {
 
@@ -436,11 +410,11 @@ app.post('/ratings', function(req, res) {
 
 app.put('/ratings', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
-    var rating = parseInt(validator.trim(validator.escape(req.param('rating'))));
-    var oldRating = parseInt(validator.trim(validator.escape(req.param('oldRating'))));
-    var commentary = validator.trim(validator.escape(req.param('commentary')));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var bookId = validator.trim(validator.escape(req.body.bookId));
+    var rating = parseInt(validator.trim(validator.escape(req.body.rating)));
+    var oldRating = parseInt(validator.trim(validator.escape(req.body.oldRating)));
+    var commentary = validator.trim(validator.escape(req.body.commentary));
 
     bookController.updateRating(bookId, rating, oldRating, function(respBook) {
         if(respBook.error) {
@@ -457,9 +431,9 @@ app.put('/ratings', function(req, res) {
 
 app.delete('/ratings', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
-    var oldRating = parseInt(validator.trim(validator.escape(req.param('oldRating'))));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var bookId = validator.trim(validator.escape(req.query.bookId));
+    var oldRating = parseInt(validator.trim(validator.escape(req.query.oldRating)));
 
     bookController.deleteRating(bookId, oldRating, function(respBook) {
 
@@ -486,7 +460,7 @@ app.get('/subjects/all', function(req, res) {
 
 app.get('/subjects/bycourse', function(req, res) {
 
-    var course = validator.trim(validator.escape(req.param('course')));
+    var course = validator.trim(validator.escape(req.query.course));
 
     subjectsController.listByCourse(course, function(resp) {
         res.json(resp);
@@ -495,64 +469,25 @@ app.get('/subjects/bycourse', function(req, res) {
 
 app.get('/subjects', function(req, res) {
 
-    var name = validator.trim(validator.escape(req.param('subjectName')));
-    var course = validator.trim(validator.escape(req.param('course')));
+    var name = validator.trim(validator.escape(req.query.subjectName));
+    var course = validator.trim(validator.escape(req.query.course));
 
     subjectsController.subject(name, course, function(resp) {
         res.json(resp);
     });
 });
 
-app.get('/subjects/period/:period', function(req, res) {
-
-    var period = parseInt(validator.trim(validator.escape(req.param('period'))));
-    var course = validator.trim(validator.escape(req.param('course')));
-
-    subjectsController.listsubj(period, course, function(resp) {
-
-        res.json(resp);
-    });
-
-});
-
 app.post('/subjects', function(req, res) {
 
-    var name = validator.trim(validator.escape(req.param('subjectName')));
-    var period = parseInt(validator.trim(validator.escape(req.param('period'))));
-    var credits = parseInt(validator.trim(validator.escape(req.param('credits'))));
-    var course = validator.trim(validator.escape(req.param('course')));
+    var name = validator.trim(validator.escape(req.body.subjectName));
+    var period = parseInt(validator.trim(validator.escape(req.params.period)));
+    var credits = parseInt(validator.trim(validator.escape(req.params.credits)));
+    var course = validator.trim(validator.escape(req.params.course));
 
     subjectsController.save(name, period, credits, course, function(resp) {
         res.json(resp);
     });
 });
-
-
-app.put('/subjects', function(req, res) {
-
-    var name = validator.trim(validator.escape(req.param('subjectName')));
-    var newName = validator.trim(validator.escape(req.param('newName')));
-    var course = validator.trim(validator.escape(req.param('course')));
-    var period = parseInt(validator.trim(validator.escape(req.param('period'))));
-
-    // To don't update this field, assign a invalid value
-    var numBibliographiesInvalid = "";
-
-    subjectsController.update(name, newName, period, course, numBibliographiesInvalid, function(resp) {
-            res.json(resp);
-    });
-});
-
-app.delete('/subjects', function(req, res) {
-
-    var name = validator.trim(validator.escape(req.param('subjectName')));
-    var course = validator.trim(validator.escape(req.param('course')));
-
-    subjectsController.delete(name, course, function(resp) {
-        res.json(resp);
-    });
-});
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -565,9 +500,9 @@ app.get('/enrollments/all', function(req, res) {
 
 app.get('/enrollments', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var subjectName = validator.trim(validator.escape(req.param('subjectName')));
-    var course = validator.trim(validator.escape(req.param('course')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var subjectName = validator.trim(validator.escape(req.query.subjectName));
+    var course = validator.trim(validator.escape(req.query.course));
 
     enrollmentsController.enrollment(userId, subjectName, course, function(respEnrollment) {
         res.json(respEnrollment);
@@ -576,8 +511,8 @@ app.get('/enrollments', function(req, res) {
 
 app.get('/users/:userId/enrollments', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var course = validator.trim(validator.escape(req.param('course')));
+    var userId = validator.trim(validator.escape(req.params.userId));
+    var course = validator.trim(validator.escape(req.query.course));
 
     userController.user(userId, function(respUser) {
         if(respUser.error) {
@@ -590,13 +525,12 @@ app.get('/users/:userId/enrollments', function(req, res) {
     });
 });
 
-
 app.post('/enrollments', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var subjectName = validator.trim(validator.escape(req.param('subjectName')));
-    var course = validator.trim(validator.escape(req.param('course')));
-    var isFinished = validator.trim(validator.escape(req.param('isFinished')));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var subjectName = validator.trim(validator.escape(req.body.subjectName));
+    var course = validator.trim(validator.escape(req.body.course));
+    var isFinished = validator.trim(validator.escape(req.body.isFinished));
 
     enrollmentsController.save(userId, subjectName, course, isFinished, function(respEnrollment) {
         res.json(respEnrollment);
@@ -605,10 +539,10 @@ app.post('/enrollments', function(req, res) {
 
 app.put('/enrollments', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var subjectName = validator.trim(validator.escape(req.param('subjectName')));
-    var course = validator.trim(validator.escape(req.param('course')));
-    var isFinished = validator.trim(validator.escape(req.param('isFinished')));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var subjectName = validator.trim(validator.escape(req.body.subjectName));
+    var course = validator.trim(validator.escape(req.body.course));
+    var isFinished = validator.trim(validator.escape(req.body.isFinished));
 
     enrollmentsController.update(userId, subjectName, course, isFinished, function(resp) {
         res.json(resp);
@@ -617,9 +551,9 @@ app.put('/enrollments', function(req, res) {
 
 app.delete('/enrollments', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var subjectName = validator.trim(validator.escape(req.param('subjectName')));
-    var course = validator.trim(validator.escape(req.param('course')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var subjectName = validator.trim(validator.escape(req.query.subjectName));
+    var course = validator.trim(validator.escape(req.query.course));
 
     enrollmentsController.delete(userId, subjectName, course, function(respEnrollment) {
         res.json(respEnrollment);
@@ -637,9 +571,9 @@ app.get('/bibliographies/all', function(req, res) {
 
 app.get('/bibliographies', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var subjectName = validator.trim(validator.escape(req.param('subjectName')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var subjectName = validator.trim(validator.escape(req.query.subjectName));
+    var bookId = validator.trim(validator.escape(req.query.bookId));
 
     bibliographyController.bibliography(userId, subjectName, bookId, function(respBibliography) {
         res.json(respBibliography);
@@ -648,7 +582,7 @@ app.get('/bibliographies', function(req, res) {
 
 app.get('/bibliographies/subjects/:subjectName', function(req, res) {
 
-    var subjectName = validator.trim(validator.escape(req.param('subjectName')));
+    var subjectName = validator.trim(validator.escape(req.params.subjectName));
 
     bibliographyController.listBySubject(subjectName, function(respBibliography) {
         res.json(respBibliography);
@@ -657,10 +591,10 @@ app.get('/bibliographies/subjects/:subjectName', function(req, res) {
 
 app.post('/bibliographies', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var subjectName = validator.trim(validator.escape(req.param('subjectName')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
-    var course = validator.trim(validator.escape(req.param('course')));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var subjectName = validator.trim(validator.escape(req.body.subjectName));
+    var bookId = validator.trim(validator.escape(req.body.bookId));
+    var course = validator.trim(validator.escape(req.body.course));
 
     bibliographyController.save(userId, subjectName, bookId, function(respBibliography) {
         if(respBibliography.error) {
@@ -687,10 +621,10 @@ app.post('/bibliographies', function(req, res) {
 
 app.delete('/bibliographies', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var subjectName = validator.trim(validator.escape(req.param('subjectName')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
-    var course = validator.trim(validator.escape(req.param('course')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var subjectName = validator.trim(validator.escape(req.query.subjectName));
+    var bookId = validator.trim(validator.escape(req.query.bookId));
+    var course = validator.trim(validator.escape(req.query.course));
 
     bibliographyController.delete(userId, subjectName, bookId, function(respBibliography) {
         if(respBibliography.error) {
@@ -726,8 +660,8 @@ app.get('/desireds/all', function(req, res) {
 
 app.get('/desireds', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var bookId = validator.trim(validator.escape(req.query.bookId));
 
     desiredController.desired(userId, bookId, function(resp) {
         res.json(resp);
@@ -736,7 +670,7 @@ app.get('/desireds', function(req, res) {
 
 app.get('/users/:userId/desireds', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
+    var userId = validator.trim(validator.escape(req.params.userId));
 
     desiredController.listByUser(userId,  function(resp) {
         res.json(resp);
@@ -745,8 +679,8 @@ app.get('/users/:userId/desireds', function(req, res) {
 
 app.post('/desireds', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var bookId = validator.trim(validator.escape(req.body.bookId));
 
      desiredController.save(userId, bookId, function(resp) {
         res.json(resp);
@@ -755,8 +689,8 @@ app.post('/desireds', function(req, res) {
 
 app.delete('/desireds', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var bookId = validator.trim(validator.escape(req.param('bookId')));
+    var userId = validator.trim(validator.escape(req.query.userId));
+    var bookId = validator.trim(validator.escape(req.query.bookId));
 
     desiredController.delete(userId, bookId, function(resp) {
         res.json(resp);
@@ -767,7 +701,7 @@ app.delete('/desireds', function(req, res) {
 
 app.get('/users/:userId/complaint', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
+    var userId = validator.trim(validator.escape(req.params.userId));
 
     complaintController.list(userId, function(resp) {
         res.json(resp);
@@ -776,10 +710,10 @@ app.get('/users/:userId/complaint', function(req, res) {
 
 app.post('/users/:userId/complaint', function(req, res) {
 
-    var userId = validator.trim(validator.escape(req.param('userId')));
-    var message = validator.trim(validator.escape(req.param('message')));
-    var subject = validator.trim(validator.escape(req.param('subject')));
-    var signature = validator.trim(validator.escape(req.param('signature')));
+    var userId = validator.trim(validator.escape(req.body.userId));
+    var message = validator.trim(validator.escape(req.body.message));
+    var subject = validator.trim(validator.escape(req.body.subject));
+    var signature = validator.trim(validator.escape(req.body.signature));
 
     sendEmail(message, subject, signature);
 
@@ -819,7 +753,7 @@ app.get('/courses/all', function(req, res) {
 
 app.get('/courses', function(req, res) {
 
-    var courseName = validator.trim(validator.escape(req.param('courseName')));
+    var courseName = validator.trim(validator.escape(req.query.courseName));
 
     courseController.course(courseName, function(resp) {
 
@@ -829,22 +763,10 @@ app.get('/courses', function(req, res) {
 
 app.post('/courses', function(req, res) {
 
-    var courseName = validator.trim(validator.escape(req.param('courseName')));
-    var periods = validator.trim(validator.escape(req.param('periods')));
+    var courseName = validator.trim(validator.escape(req.body.courseName));
+    var periods = validator.trim(validator.escape(req.body.periods));
 
     courseController.save(courseName, periods, function(resp) {
         res.json(resp);
     });
 });
-
-app.delete('/courses/:courseName', function(req, res) {
-
-    var courseName = validator.trim(validator.escape(req.param('courseName')));
-
-    courseController.delete(courseName, function(resp) {
-        res.json(resp);
-    });
-});
-
-////////////////////////////////////////////////////////////////////////////////
-
